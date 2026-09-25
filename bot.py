@@ -1,13 +1,29 @@
 import os
 import discord
+import random
+
+# Загружаем пословицы из файла proverbs.txt
+try:
+    with open("proverbs.txt", "r", encoding="utf-8") as f:
+        proverbs = [line.strip() for line in f if line.strip()]
+
+    print(f"Загружено пословиц: {len(proverbs)}")
+
+except FileNotFoundError:
+    proverbs = []
+    print("Ошибка: файл proverbs.txt не найден!")
+
 
 TOKEN = os.getenv("DISCORD_TOKEN")
 
 # ID роли администраторов
 ADMIN_ROLE_ID = 1329497877516390421
 
+
+# Настройки Discord
 intents = discord.Intents.default()
 intents.members = True
+intents.message_content = True
 
 client = discord.Client(intents=intents)
 tree = discord.app_commands.CommandTree(client)
@@ -17,6 +33,21 @@ tree = discord.app_commands.CommandTree(client)
 async def on_ready():
     await tree.sync()
     print(f"Бот запущен: {client.user}")
+
+
+@client.event
+async def on_message(message):
+    # Не реагируем на сообщения самого бота
+    if message.author == client.user:
+        return
+
+    # 25% вероятность ответить поговоркой
+    if proverbs and random.random() < 0.25:
+        proverb = random.choice(proverbs)
+        await message.reply(proverb)
+
+    # Передаём сообщение дальше, чтобы продолжали работать команды
+    await client.process_commands(message)
 
 
 @tree.command(
