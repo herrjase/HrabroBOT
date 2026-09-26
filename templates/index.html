@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>HrabRobot</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+
+            font-family:
+                Arial,
+                Helvetica,
+                sans-serif;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #111827,
+                    #1e293b
+                );
+
+            color: white;
+
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 850px;
+        }
+
+        .card {
+            background: rgba(15, 23, 42, 0.92);
+
+            border: 1px solid
+                rgba(255,255,255,0.08);
+
+            border-radius: 20px;
+
+            padding: 40px;
+
+            box-shadow:
+                0 20px 60px
+                rgba(0,0,0,0.4);
+        }
+
+        .logo {
+            font-size: 60px;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        h1 {
+            text-align: center;
+            margin: 0;
+
+            font-size: 38px;
+        }
+
+        .description {
+            text-align: center;
+
+            color: #94a3b8;
+
+            margin-top: 10px;
+            margin-bottom: 30px;
+
+            font-size: 17px;
+        }
+
+        .status {
+            text-align: center;
+
+            margin-bottom: 30px;
+
+            color: #86efac;
+
+            font-weight: bold;
+        }
+
+        .search {
+            display: flex;
+
+            gap: 10px;
+
+            margin-bottom: 30px;
+        }
+
+        .search input {
+            flex: 1;
+
+            padding: 15px 18px;
+
+            border: none;
+
+            border-radius: 12px;
+
+            background: #334155;
+
+            color: white;
+
+            font-size: 16px;
+
+            outline: none;
+        }
+
+        .search input:focus {
+            background: #475569;
+        }
+
+        .search button {
+            border: none;
+
+            border-radius: 12px;
+
+            padding: 0 25px;
+
+            background: #3b82f6;
+
+            color: white;
+
+            font-size: 16px;
+
+            cursor: pointer;
+        }
+
+        .search button:hover {
+            background: #2563eb;
+        }
+
+        .grid {
+            display: grid;
+
+            grid-template-columns:
+                repeat(3, 1fr);
+
+            gap: 15px;
+        }
+
+        .item {
+            padding: 20px;
+
+            border-radius: 15px;
+
+            background: #1e293b;
+
+            text-align: center;
+        }
+
+        .item-icon {
+            font-size: 30px;
+
+            margin-bottom: 10px;
+        }
+
+        .item-title {
+            font-weight: bold;
+
+            margin-bottom: 5px;
+        }
+
+        .item-text {
+            color: #94a3b8;
+
+            font-size: 14px;
+        }
+
+        footer {
+            margin-top: 30px;
+
+            text-align: center;
+
+            color: #64748b;
+
+            font-size: 13px;
+        }
+
+        @media (max-width: 650px) {
+
+            .card {
+                padding: 25px;
+            }
+
+            h1 {
+                font-size: 30px;
+            }
+
+            .grid {
+                grid-template-columns: 1fr;
+            }
+
+            .search {
+                flex-direction: column;
+            }
+
+            .search button {
+                padding: 14px;
+            }
+        }
+
+    </style>
+</head>
+
+
+<body>
+
+<div class="container">
+
+    <div class="card">
+
+        <div class="logo">
+            🤖
+        </div>
+
+        <h1>
+            HrabRobot
+        </h1>
+
+        <div class="description">
+            Discord-бот и полезная веб-страница
+        </div>
+
+
+        {% if bot_online %}
+
+        <div class="status">
+            🟢 Бот работает
+        </div>
+
+        {% else %}
+
+        <div class="status"
+             style="color:#fca5a5;">
+            🔴 Бот запускается
+        </div>
+
+        {% endif %}
+
+
+        <!-- ПОИСК -->
+
+        <form
+            class="search"
+            action="/search"
+            method="get"
+        >
+
+            <input
+                type="text"
+                name="q"
+                placeholder="Поиск в Яндексе..."
+                autocomplete="off"
+            >
+
+            <button type="submit">
+                🔎 Найти
+            </button>
+
+        </form>
+
+
+        <!-- КАРТОЧКИ -->
+
+        <div class="grid">
+
+            <div class="item">
+
+                <div class="item-icon">
+                    🤖
+                </div>
+
+                <div class="item-title">
+                    Discord-бот
+                </div>
+
+                <div class="item-text">
+                    Бот работает на сервере
+                </div>
+
+            </div>
+
+
+            <div class="item">
+
+                <div class="item-icon">
+                    📜
+                </div>
+
+                <div class="item-title">
+                    Поговорки
+                </div>
+
+                <div class="item-text">
+                    Случайные поговорки
+                </div>
+
+            </div>
+
+
+            <div class="item">
+
+                <div class="item-icon">
+                    👮
+                </div>
+
+                <div class="item-title">
+                    Администраторы
+                </div>
+
+                <div class="item-text">
+                    Управление сервером
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <footer>
+            HrabRobot • Web interface
+        </footer>
+
+    </div>
+
+</div>
+
+</body>
+
+</html>
