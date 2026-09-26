@@ -1,8 +1,27 @@
 import os
-import discord
 import random
+import threading
 
-# Загружаем пословицы из файла proverbs.txt
+import discord
+from discord import app_commands
+
+from flask import Flask, render_template, request
+
+
+# ============================================================
+# НАСТРОЙКИ
+# ============================================================
+
+TOKEN = os.getenv("DISCORD_TOKEN")
+
+# ID роли администраторов
+ADMIN_ROLE_ID = 1329497877516390421
+
+
+# ============================================================
+# ПОСЛОВИЦЫ
+# ============================================================
+
 try:
     with open("proverbs.txt", "r", encoding="utf-8") as f:
         proverbs = [line.strip() for line in f if line.strip()]
@@ -11,71 +30,154 @@ try:
 
 except FileNotFoundError:
     proverbs = []
-    print("Ошибка: файл proverbs.txt не найден!")
+    print("Файл proverbs.txt не найден.")
 
 
-TOKEN = os.getenv("DISCORD_TOKEN")
+# ============================================================
+# DISCORD BOT
+# ============================================================
 
-# ID роли администраторов
-ADMIN_ROLE_ID = 1329497877516390421
-
-
-# Настройки Discord
 intents = discord.Intents.default()
 intents.members = True
 intents.message_content = True
 
 client = discord.Client(intents=intents)
-tree = discord.app_commands.CommandTree(client)
+tree = app_commands.CommandTree(client)
 
 
 @client.event
 async def on_ready():
     await tree.sync()
+
     print(f"Бот запущен: {client.user}")
+    print(f"ID бота: {client.user.id}")
 
 
-@client.event
-async def on_message(message):
-    # Не реагируем на сообщения самого бота
-    if message.author == client.user:
-        return
-
-    # 25% вероятность ответить поговоркой
-    if proverbs and random.random() < 0.25:
-        proverb = random.choice(proverbs)
-        await message.reply(proverb)
-
+# ============================================================
+# КОМАНДА /АДМИНЫ
+# ============================================================
 
 @tree.command(
     name="админы",
-    description="Показать список администраторов сервера"
+    description="Показать администраторов сервера"
 )
 async def admins(interaction: discord.Interaction):
-    role = interaction.guild.get_role(ADMIN_ROLE_ID)
+
+    guild = interaction.guild
+
+    if guild is None:
+        await interaction.response.send_message(
+            "Эту команду можно использовать только на сервере."
+        )
+        return
+
+    role = guild.get_role(ADMIN_ROLE_ID)
 
     if role is None:
         await interaction.response.send_message(
-            "❌ Роль администраторов не найдена."
+            "Роль администратора не найдена."
         )
         return
 
-    members = role.members
+    members = [
+        member
+        for member in guild.members
+        if role in member.roles
+    ]
 
     if not members:
         await interaction.response.send_message(
-            "ℹ️ У роли администраторов пока нет участников."
+            "Администраторов с этой ролью не найдено."
         )
         return
 
-    admins_list = "\n".join(
+    text = "\n".join(
         f"• {member.mention}"
         for member in members
     )
 
     await interaction.response.send_message(
-        f"👑 **Администраторы сервера:**\n\n{admins_list}"
+        f"**Администраторы:**\n{text}"
     )
 
 
-client.run(TOKEN)
+# ============================================================
+# ПОГОВОРКИ — 25% ШАНСА
+# ============================================================
+
+@client.event
+async def on_message(message):
+
+    # Не отвечаем самому себе
+    if message.author == client.user:
+        return
+
+    # 25% шанс
+    if proverbs and random.random() < 0.25:
+        await message.channel.send(random.choice(proverbs))
+
+
+# ============================================================
+# WEB-САЙТ
+# ============================================================
+
+app = Flask(__name__)
+
+
+@app.route("/")
+def home():
+
+    return render_template(
+        "index.html",
+        bot_name=str(client.user) if client.user else "HrabRobot",
+        bot_online=client.is_ready()
+    )
+
+
+@app.route("/search")
+def search():
+
+    query = request.args.get("q", "").strip()
+
+    if query:
+        # Перенаправляем пользователя в Яндекс
+        from flask import redirect
+
+        return redirect(
+            "https://yandex.ru/search/?text=" + query
+        )
+
+    return render_template(
+        "index.html",
+        bot_name=str(client.user) if client.user else "HrabRobot",
+        bot_online=client.is_ready()
+    )
+
+
+def run_web():
+    port = int(os.environ.get("PORT", 8080))
+
+    app.run(
+        host="0.0.0.0",
+        port=port,
+        debug=False
+    )
+
+
+# ============================================================
+# ЗАПУСК
+# ============================================================
+
+if __name__ == "__main__":
+
+    # Запускаем сайт отдельным потоком,
+    # чтобы Discord-бот продолжал работать.
+    web_thread = threading.Thread(
+        target=run_web,
+        daemon=True
+    )
+
+    web_thread.start()
+
+    # Запускаем Discord
+    client.run(TOKEN)
