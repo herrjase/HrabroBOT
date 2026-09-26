@@ -46,9 +46,6 @@ async def on_message(message):
         proverb = random.choice(proverbs)
         await message.reply(proverb)
 
-    # Передаём сообщение дальше, чтобы продолжали работать команды
-    await client.process_commands(message)
-
 
 @tree.command(
     name="админы",
