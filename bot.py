@@ -143,6 +143,26 @@ async def link(
         )
 
 # =========================================================
+# КОМАНДА /ЗАМЕЧАНИЕ
+# =========================================================
+@tree.command(name="замечание", description="Сделать участнику письменное замечание")
+@app_commands.describe(участник="Участник, которому выносится замечание")
+async def замечание(interaction: discord.Interaction, участник: discord.Member):
+
+    admin_role_id = 1329497877516390421
+
+    if not any(role.id == admin_role_id for role in interaction.user.roles):
+        await interaction.response.send_message(
+            "❌ У вас нет прав для использования этой команды.",
+            ephemeral=True
+        )
+        return
+
+    await interaction.response.send_message(
+        f"{участник.mention}, не балуйся 😡"
+    )
+
+# =========================================================
 # ВЕБ-САЙТ
 # =========================================================
 
