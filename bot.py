@@ -28,8 +28,8 @@ except FileNotFoundError:
 
 TOKEN = os.getenv("DISCORD_TOKEN")
 
-# ID роли администраторов
-ADMIN_ROLE_ID = 1329497877516390421
+# ID роли кандидатов
+CANDIDATE_ROLE_ID = 1553795502334550026
 
 
 # =========================================================
@@ -68,20 +68,20 @@ async def on_message(message):
 
 
 # =========================================================
-# КОМАНДА /АДМИНЫ
+# КОМАНДА /КАНДИДАТЫ
 # =========================================================
 
 @tree.command(
-    name="админы",
-    description="Показать список администраторов сервера"
+    name="кандидаты",
+    description="Показать список кандидатов сервера"
 )
-async def admins(interaction: discord.Interaction):
+async def candidates(interaction: discord.Interaction):
 
-    role = interaction.guild.get_role(ADMIN_ROLE_ID)
+    role = interaction.guild.get_role(CANDIDATE_ROLE_ID)
 
     if role is None:
         await interaction.response.send_message(
-            "❌ Роль администраторов не найдена."
+            "❌ Роль кандидатов не найдена."
         )
         return
 
@@ -89,17 +89,17 @@ async def admins(interaction: discord.Interaction):
 
     if not members:
         await interaction.response.send_message(
-            "ℹ️ У роли администраторов пока нет участников."
+            "ℹ️ У роли кандидатов пока нет участников."
         )
         return
 
-    admins_list = "\n".join(
+    candidates_list = "\n".join(
         f"• {member.mention}"
         for member in members
     )
 
     await interaction.response.send_message(
-        f"👑 **Администраторы сервера:**\n\n{admins_list}"
+        f"📋 **Кандидаты:**\n\n{candidates_list}"
     )
 
 
