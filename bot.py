@@ -102,6 +102,45 @@ async def candidates(interaction: discord.Interaction):
         f"📋 **Кандидаты:**\n\n{candidates_list}"
     )
 
+# =========================================================
+# КОМАНДА /ССЫЛКА
+# =========================================================
+
+@tree.command(
+    name="ссылка",
+    description="Получить ссылку на сервер или сайт"
+)
+@discord.app_commands.describe(
+    тип="Выберите, какую ссылку получить"
+)
+@discord.app_commands.choices(
+    тип=[
+        discord.app_commands.Choice(
+            name="сервер",
+            value="сервер"
+        ),
+        discord.app_commands.Choice(
+            name="сайт",
+            value="сайт"
+        )
+    ]
+)
+async def link(
+    interaction: discord.Interaction,
+    тип: discord.app_commands.Choice[str]
+):
+
+    if тип.value == "сервер":
+        await interaction.response.send_message(
+            "🔗 **Ссылка на Discord-сервер:**\n"
+            "https://discord.gg/svoyak"
+        )
+
+    elif тип.value == "сайт":
+        await interaction.response.send_message(
+            "🌐 **Ссылка на сайт бота:**\n"
+            "https://hrabrobot.herrjase.blitz.cloud/"
+        )
 
 # =========================================================
 # ВЕБ-САЙТ
