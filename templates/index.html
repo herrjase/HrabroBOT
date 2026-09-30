@@ -63,11 +63,22 @@
         }
 
         .logo {
-            font-size: 60px;
-            text-align: center;
-            margin-bottom: 10px;
-        }
+    width: clamp(80px, 22vw, 110px);
+    height: clamp(80px, 22vw, 110px);
 
+    margin: 0 auto 15px;
+
+    border-radius: 50%;
+    overflow: hidden;
+}
+
+.logo img {
+    width: 100%;
+    height: 100%;
+
+    object-fit: cover;
+    display: block;
+}
         h1 {
             text-align: center;
             margin: 0;
